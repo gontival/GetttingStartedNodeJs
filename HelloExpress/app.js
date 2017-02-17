@@ -3,6 +3,18 @@ var app = express();
 var formidable = require('formidable');
 
 app.use(express.static(__dirname + '/public'));
+app.post('/SubmitHelloPost', function (request, response) {
+    if (request.method.toLowerCase() == 'post') {
+        // parse form data
+        var form = new formidable.IncomingForm();
+        form.parse(request, function (err, fields) {
+            response.writeHead(200, { 'Content-Type': 'text/html' });
+            response.write('Yo ' + fields.userName + ' !<br/>');
+            response.end('Have a POST great day !');
+            console.log('Handled post request from ' + fields.userName);
+        });
+    }
+});
 
 app.get('/SubmitHello', function (request, response) {
     response.writeHead(200, { 'Content-Type': 'text/html' });
