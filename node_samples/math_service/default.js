@@ -9,42 +9,8 @@ $(document).ready(function () {
 });
 
 function addNumbers() {
-    var x = document.getElementById('x').value;
-    var y = document.getElementById('y').value;
-    var result = document.getElementById('result');
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            var jsonObject = JSON.parse(xmlhttp.response);
-            result.innerHTML = jsonObject.result;
-        }
-    }
-    xmlhttp.addEventListener('progress', updateProgress, false);
-    xmlhttp.addEventListener('errors', failed, false);
-    xmlhttp.addEventListener('abort', canceled, false);
-    xmlhttp.open('GET', '/addition?x=' + x + '&y=' + y, true);
-    xmlhttp.send();
-
-    function updateProgress(evt) {
-        if(evt.lengthComputable)
-        {
-            var percentComplete = evt.loaded / evt.total;
-            // display percentComplete
-        }
-        else
-        {
-            //Need total size to compute progress
-        }
-    }
-
-    function failed() {
-        alert('an error occured');
-    }
-
-    function canceled() {
-        alert('canceled by the user');
-    }
-
+    var data = getFormData();
+    serverAddition(data).done(displayResult);
 }
 
 function addNumbersjQuery() {
@@ -65,43 +31,60 @@ function addNumbersjQuery() {
 }
 
 function substractNumbers() {
-    var x = $('#x').val();
-    var y = $('#y').val();
-    var data = { "x": x, "y": y };
-
-    $.post('/substraction', data, function (data) {
-        $('#result').html(data);
-    },'json');
+    var data = getFormData();
+    serverSubstraction(data).done(displayResult);
 }
 
 function multiplyNumbers(){
+    var data = getFormData();
+    serverMultiplication(data).done(displayResult);
+}
+
+function divideNumbers() {
+    var data = getFormData();
+    serverDivision(data).done(displayResult).fail(displayError);
+}
+
+function displayError(serverData, error) {
+    var value = 'No result';
+    if ('result' in serverData) value = serverData.result;
+    $('#result').html(value + ' - '+ error);
+}
+
+function getFormData() {
     var x = $('#x').val();
     var y = $('#y').val();
-    var data = {'x': x, 'y': y};
-    $.ajax({
+    return { "x": x, "y": y };
+}
+
+function serverAddition(data){
+    return $.getJSON('/addition', data);
+}
+
+function serverSubstraction(data) {
+    return $.post('/substraction', data, 'json');
+}
+
+function serverMultiplication(data) {
+    return $.ajax({
         url: '/multiply',
         data: data,
         type: 'PUT',
         cache: false,
         datatype: 'json',
-        success: function (data) {
-            $('#result').html(data.result);
-        }
     });
 }
 
-function divideNumbers() {
-    var x = $('#x').val();
-    var y = $('#y').val();
-    var data = { 'x': x, 'y': y };
-    $.ajax({
+function serverDivision(data) {
+    return $.ajax({
         url: '/divide',
         data: data,
         type: 'DELETE',
-        datatype: 'json',
         cache: false,
-        success: function (data) {
-            $('#result').html(data.result);
-        }
+        datatype: 'json'
     });
+}
+
+function displayResult(serverData) {
+    $('#result').html(serverData.result);
 }
