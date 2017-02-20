@@ -1,7 +1,11 @@
 ﻿/// <reference path="_references.js" />
 
 $(document).ready(function () {
-    $('#btnAdd').on('click', addNumbers);
+    //$('#btnAdd').on('click', addNumbers);
+    $('#btnAdd').on('click', addNumbersjQuery);
+    $('#btnSubstract').on('click', substractNumbers);
+    $('#btnMultiplication').on('click', multiplyNumbers);
+    $('#btnDivision').on('click', divideNumbers);
 });
 
 function addNumbers() {
@@ -41,4 +45,63 @@ function addNumbers() {
         alert('canceled by the user');
     }
 
+}
+
+function addNumbersjQuery() {
+    //replacement with jQuery
+    var x = $('#x').val();
+    var y = $('#y').val();
+    var data = { "x": x, "y": y };
+    $.ajax({
+        url: '/addition',
+        data: data,
+        type: 'GET',
+        cache: false,
+        datatype: 'json',
+        success: function (data) {
+            $('#result').html(data.result);
+        }
+    });
+}
+
+function substractNumbers() {
+    var x = $('#x').val();
+    var y = $('#y').val();
+    var data = { "x": x, "y": y };
+
+    $.post('/substraction', data, function (data) {
+        $('#result').html(data);
+    },'json');
+}
+
+function multiplyNumbers(){
+    var x = $('#x').val();
+    var y = $('#y').val();
+    var data = {'x': x, 'y': y};
+    $.ajax({
+        url: '/multiply',
+        data: data,
+        type: 'PUT',
+        cache: false,
+        datatype: 'json',
+        success: function (data) {
+            $('#result').html(data.result);
+        }
+    });
+}
+
+function divideNumbers() {
+    var x = $('#x').val();
+    var y = $('#y').val();
+    var data = { 'x': x, 'y': y };
+    $.ajax({
+        url: '/divide',
+        data: data,
+        type: 'DELETE',
+        datatype: 'json',
+        cache: false,
+        success: function (data) {
+            $('#result').html(data.result);
+        }
+    });
 }
